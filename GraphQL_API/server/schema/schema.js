@@ -3,7 +3,8 @@ const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
-  GraphQLID
+  GraphQLID,
+  GraphQLList,
 } = require('graphql');
 const lodash = require('lodash');
 
@@ -14,6 +15,7 @@ const tasks = [
     weight: 1,
     description:
       "Create your first HTML file 0-index.html with: -Add the doctype on the first line (without any comment) -After the doctype, open and close a html tag Open your file in your browser (the page should be blank)",
+    projectId: '1'
   },
   {
     id: "2",
@@ -21,6 +23,7 @@ const tasks = [
     weight: 1,
     description:
       "Copy the content of 0-index.html into 1-index.html Create the head and body sections inside the html tag, create the head and body tags (empty) in this order",
+    projectId: '1'
   }
 ];
 
@@ -47,6 +50,12 @@ const TaskType = new GraphQLObjectType({
     title: { type: GraphQLString },
     weight: { type: GraphQLInt },
     description: { type: GraphQLString },
+    project: {
+      type: ProjectType,
+      resolve(parent) {
+        return lodash.find(projects, { id: parent.projectId });
+      }
+    }
   })
 });
 
@@ -57,9 +66,14 @@ const ProjectType = new GraphQLObjectType({
     title: { type: GraphQLString },
     weight: { type: GraphQLInt },
     description: { type: GraphQLString },
+    tasks: {
+      type: new GraphQLList(TaskType),
+      resolve(parent) {
+        return lodash.filter(tasks, { projectId: parent.id });
+      }
+    }
   })
 });
-
 
 
 const RootQuery = new GraphQLObjectType({
