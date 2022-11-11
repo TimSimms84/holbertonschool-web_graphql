@@ -92,8 +92,20 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args) {
         return lodash.find(projects, { id: args.id });
       }
-    } 
-  },
+    },
+    tasks: {
+      type: new GraphQLList(TaskType),
+      resolve() {
+        return tasks;
+      }
+    },
+    projects: {
+      type: new GraphQLList(ProjectType),
+      resolve() {
+        return projects;
+      }
+    }
+  }
 });
 
 const schema = new GraphQLSchema({
