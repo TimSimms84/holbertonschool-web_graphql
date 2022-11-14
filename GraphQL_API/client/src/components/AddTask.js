@@ -125,4 +125,4 @@ function AddTask(props) {
   );
 }
 
-export default AddTask;
+export default graphql(getProjectsQuery)(AddTask);
