@@ -5,8 +5,11 @@ const {
   GraphQLInt,
   GraphQLID,
   GraphQLList,
+  GraphQLNonNull
 } = require('graphql');
 const lodash = require('lodash');
+const Project = require('../models/project');
+const Task = require('../models/task');
 
 const tasks = [
   {
@@ -38,10 +41,7 @@ const projects = [
     weight: 1,
     description: 'Bootstrap is a free and open-source CSS framework directed at responsive, mobile-first front-end web development. It contains CSS and JavaScript design templates for typography, forms, buttons, navigation, and other interface components.'
   }
-]
-    
-
-
+]  
 
 const TaskType = new GraphQLObjectType({
   name: 'Task',
@@ -108,8 +108,51 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addProject: {
+      type: ProjectType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        weight: { type: new GraphQLNonNull(GraphQLInt) },
+        description: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve(parent, args) {
+        const project = new Project({
+          title: args.title,
+          weight: args.weight,
+          description: args.description
+        });
+        return project.save();
+      }
+    },
+    addTask: {
+      type: TaskType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        weight: { type: new GraphQLNonNull(GraphQLInt) },
+        description: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        const task = new Task({
+          title: args.title,
+          weight: args.weight,
+          description: args.description
+        });
+        return task.save();
+      }
+    }
+  }
+});
+
+
+
+
+
 const schema = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: Mutation
 });
 
 module.exports = schema;
